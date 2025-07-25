@@ -123,6 +123,58 @@ After running inference, the output folder will contain:
 
 ---
 
+## 📈 Evaluation & Metrics
+
+### 🔍 Per-Case Metrics
+
+After generating predictions on validation samples, we used `nnUNetv2_evaluate_folder` to compute evaluation metrics. Ground truth labels were copied into a temporary folder and evaluated against predictions.
+
+```bash
+nnUNetv2_evaluate_folder \
+  /content/labels_for_evaluation \
+  /content/drive/MyDrive/nnUNet/predictions \
+  -djfile /path/to/dataset.json \
+  -pfile /path/to/plans.json
+```
+
+A `summary.json` file is generated containing detailed per-case metrics.
+
+---
+
+## 📊 Dice Score Per Case
+
+Each predicted case was evaluated with Dice coefficient & was shown by bar chart generated using `matplotlib`:
+
+---
+
+## 📋 Metrics Extracted for Each File
+
+For each predicted case, the following metrics were calculated:
+
+| Metric        | Description                                 |
+| ------------- | ------------------------------------------- |
+| Dice          | Overlap between prediction and ground truth |
+| Jaccard (IoU) | Intersection over Union                     |
+| Recall        | Sensitivity (TP / (TP + FN))                |
+| Precision     | Positive Predictive Value (TP / (TP + FP))  |
+
+Results are stored in `per_case_metrics.csv` for further analysis.
+
+---
+
+## 📌 Mean Metrics (Model Level)
+
+The average performance across all validation cases:
+
+```
+Dice:      0.XXXX
+Jaccard:   0.XXXX
+Recall:    0.XXXX
+Precision: 0.XXXX
+```
+
+---
+
 ## 🔗 Useful Resources
 
 - 📘 [nnU-Net Official GitHub](https://github.com/MIC-DKFZ/nnUNet)
