@@ -167,10 +167,10 @@ Results are stored in `per_case_metrics.csv` for further analysis.
 The average performance across all validation cases:
 
 ```
-Dice:      0.XXXX
-Jaccard:   0.XXXX
-Recall:    0.XXXX
-Precision: 0.XXXX
+Dice:      0.6772
+Jaccard:   0.5165
+Recall:    0.6255
+Precision: 0.7502
 ```
 
 ---
