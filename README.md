@@ -81,9 +81,9 @@ Output generated in `nnUNet_preprocessed`. Cross-validation split saved in `spli
 
 **3D fullres configuration:**
 ```
-nnUNetv2_plan_and_preprocess -d 300 --verify_dataset_integrity
+nnUNetv2_plan_and_preprocess -d 300 -c 3d_fullres --verify_dataset_integrity
 ```
-Run without a `-c` flag, so this plans and preprocesses all available configurations (including `3d_fullres`), with integrity verification enabled. Output generated in `nnUNet_preprocessed_3d`.
+Scoped to the `3d_fullres` configuration only, with integrity verification enabled. Since the `nnUNet_preprocessed` environment variable is pointed at `nnUNet_preprocessed_3d` in this notebook, output is generated there.
 
 ---
 
