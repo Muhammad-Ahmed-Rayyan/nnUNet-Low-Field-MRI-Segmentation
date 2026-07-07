@@ -23,9 +23,12 @@ Built with the tools and technologies:
 
 This project focuses on **hippocampus segmentation** from **low-field pediatric brain MRI scans**, using [nnU-Net](https://github.com/MIC-DKFZ/nnUNet) — a self-configuring deep learning framework for medical image segmentation. The dataset used comes from the **MICCAI LISA 2024 Challenge** proceedings.
 
+Two training configurations are included in this repo:
+- **2D** (`nnUNet_Segmentation.ipynb`) — full pipeline: dataset prep, preprocessing, training, prediction, and evaluation.
+- **3D fullres** (`nnUNet_3D_Segmentation.ipynb`) — training run using nnU-Net's 3D full-resolution configuration.
 
-Recommended(If using Google Colab):   
-Mount **Google Drive** and store the input files there using the folder structure required by **nnU-Net**.  
+Recommended (if using Google Colab):
+Mount **Google Drive** and store the input files there using the folder structure required by **nnU-Net**.
 This is especially useful in **Google Colab**, where GPU sessions may disconnect or crash — keeping your data on Drive ensures you don't lose progress.
 
 ---
@@ -37,11 +40,13 @@ This is especially useful in **Google Colab**, where GPU sessions may disconnect
 ├── nnUNet/
     ├── nnUNet_raw/
     │   └── Dataset300_LISA/
-    │       ├── imagesTr/           # Input MRI volumes (NIfTI format)
-    │       ├── labelsTr/           # Corresponding segmentation masks
-    │       └── dataset.json        # Dataset metadata
-    ├── nnUNet_preprocessed/        # Preprocessing checkpoints & data
-    └── nnUNet_results/             # Model outputs, checkpoints
+    │       ├── imagesTr/               # Input MRI volumes (NIfTI format)
+    │       ├── labelsTr/               # Corresponding segmentation masks
+    │       └── dataset.json            # Dataset metadata
+    ├── nnUNet_preprocessed/            # Preprocessing checkpoints & data (2D)
+    ├── nnUNet_results/                 # Model outputs, checkpoints (2D)
+    ├── nnUNet_preprocessed_3d/         # Preprocessing checkpoints & data (3D fullres)
+    └── nnUNet_results_3d/              # Model outputs, checkpoints (3D fullres)
 ```
 
 ---
@@ -67,19 +72,24 @@ All files are in .nii.gz (NIfTI) format.
 Before training, the dataset was:
 - Renamed under ID 300 in nnUNet_raw/
 - All label pixels with 2.0 were remapped to 1.0 (hippocampus only)
-- Preprocessed using:
+
+**2D configuration:**
 ```
 nnUNetv2_plan_and_preprocess -d 300 -c 2d
 ```
+Output generated in `nnUNet_preprocessed`. Cross-validation split saved in `splits_final.json`.
 
-Output generated in nnUNet_preprocessed
-Cross-validation split saved in splits_final.json
+**3D fullres configuration:**
+```
+nnUNetv2_plan_and_preprocess -d 300 --verify_dataset_integrity
+```
+Run without a `-c` flag, so this plans and preprocesses all available configurations (including `3d_fullres`), with integrity verification enabled. Output generated in `nnUNet_preprocessed_3d`.
 
 ---
 
 ## 🧠 Training
 
-To train the model on Fold 0 using 2D configuration:
+**2D — train on Fold 0:**
 ```
 nnUNetv2_train 300 2d 0
 ```
@@ -87,6 +97,15 @@ nnUNetv2_train 300 2d 0
 - Configuration: 2d
 - Fold: 0
 - Trainer: nnUNetTrainer (default)
+
+**3D fullres — train on Fold 0:**
+```
+nnUNetv2_train Dataset300_LISA 3d_fullres 0 -tr nnUNetTrainer
+```
+- Dataset: Dataset300_LISA
+- Configuration: 3d_fullres
+- Fold: 0
+- Trainer: nnUNetTrainer (explicit)
 
 ---
 
@@ -98,6 +117,8 @@ LISA_0009, LISA_0020, LISA_0040, LISA_0046,
 LISA_0050, LISA_0055, LISA_0061, LISA_0063,
 LISA_1003, LISA_1008, LISA_1009
 ```
+*(Used for the 2D pipeline's prediction and evaluation steps below.)*
+
 ---
 
 ## 📁 Prediction Output
@@ -105,7 +126,7 @@ LISA_1003, LISA_1008, LISA_1009
 After running inference, the output folder will contain:
 
 - `.nii.gz` segmentation maps for each test image
-- `dataset.json`, `plans.json`, and `predict_from_raw_data_args.json`  
+- `dataset.json`, `plans.json`, and `predict_from_raw_data_args.json`
   (used for logging, reproducibility, and metadata)
 
 ---
@@ -139,6 +160,8 @@ nnUNetv2_evaluate_folder \
 
 A `summary.json` file is generated containing detailed per-case metrics.
 
+> Note: Prediction and evaluation have currently been run for the **2D** configuration only. The 3D fullres notebook covers preprocessing and training without prediction/evaluation.
+
 ---
 
 ## 📊 Dice Score Per Case
@@ -164,7 +187,7 @@ Results are stored in `per_case_metrics.csv` for further analysis.
 
 ## 📌 Mean Metrics (Model Level)
 
-The average performance across all validation cases:
+The average performance across all validation cases (2D configuration):
 
 ```
 Dice:      0.6772
@@ -184,14 +207,14 @@ Precision: 0.7502
 
 ## 📜 Acknowledgements
 
-- The **MICCAI LISA 2024 Team** for releasing this important pediatric dataset  
-- The developers of [**nnU-Net**](https://arxiv.org/abs/1809.10486) for their impactful open-source work  
+- The **MICCAI LISA 2024 Team** for releasing this important pediatric dataset
+- The developers of [**nnU-Net**](https://arxiv.org/abs/1809.10486) for their impactful open-source work
 - [**Towards AI**](https://towardsai.net/p/l/how-i-use-nnunet-for-medical-image-segmentation-a-comprehensive-guide) for a beginner-friendly walkthrough
 
 ---
 
 <div align="center">
 
-⭐ Don’t forget to star this repo on GitHub if you found it helpful!
+⭐ Don't forget to star this repo on GitHub if you found it helpful!
 
 </div>
